@@ -3,6 +3,7 @@
 #include<cstring>
 #include<cmath>
 using namespace std;
+//test
 #define epoch_num 1000
 #define lr 0.1
 typedef struct input_Point
