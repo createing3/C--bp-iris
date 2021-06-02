@@ -1,3 +1,20 @@
+
+//直接任务
+//1.struct使用类代替
+//2.#define用静态变量表示    ————————已完成
+//3.char s[50]用string代替
+//4.修改文件结构，三个文件
+//5.split函数修改
+//6.pri函数修改
+
+
+
+
+
+
+
+
+
 #include<iostream>
 #include<stdio.h>
 #include<cstring>
@@ -5,36 +22,32 @@
 using namespace std;
 #define epoch_num 1000
 #define lr 0.1
-typedef struct input_Point
+typedef struct input_Point//输入层
 {
 	double num;
-	int w[4];
 }input_Point;
-typedef struct Point
+typedef struct Point//隐含层
 {
 	double num;
 	double out_num;
 	double t;//隐含层误差
-	int w1[4];
-	int w2[4];
 }Point;
-typedef struct output_Point
+typedef struct output_Point//输出层
 {
 	double num;
 	double out_num;
 	double t;//输出层误差
-	int w[4];
 }output_Point;
-typedef struct the_w
+typedef struct the_w//权值
 {
 	double w1[4][4];
 	double w2[4][3];
 }the_w;
-input_Point a[4];
-Point p[4];
-output_Point h[3];
-the_w w,wb;
-double sigmoid(double x)
+input_Point a[4];//输入层
+Point p[4];//隐含层
+output_Point h[3];//输出层
+the_w w,wb;//w是整个网络的权值，每次都在更新。wb是备份w，有的地方要用到更新前的权值，这时就使用wb
+double sigmoid(double x)//激活函数sigmoid
 {
 	return 1 / (1 + exp(-1 * x));
 }
@@ -47,7 +60,7 @@ void copy_w()//备份至wb
 		for (int j = 0; j < 3; j++)
 			wb.w2[i][j] = w.w2[i][j];
 }
-void bp1(int label)
+void bp1(int label)//对输出层权值w.w2进行反向传播更新
 {
 	double E_total = 0;
 	double E_1 = 0, E_2 = 0, E_3 = 0;
@@ -72,7 +85,7 @@ void bp1(int label)
 		}
 	}
 }
-void bp2()
+void bp2()//对隐含层权值w.w1进行反向传播更新
 {
 	double E_total = 0;
 	double E_1 = 0, E_2 = 0, E_3 = 0;
@@ -93,7 +106,7 @@ void bp2()
 		}
 	}
 }
-void rr(int label)
+void rr(int label)//对隐含层、输出层进行计算赋值
 {
 	for (int i = 0; i < 4; i++)//隐藏层的值
 	{
@@ -106,16 +119,13 @@ void rr(int label)
 	h[0].out_num = sigmoid(h[0].num);//进行激励函数
 	h[1].out_num = sigmoid(h[1].num);
 	h[2].out_num = sigmoid(h[2].num);
-	bp1(label);//更新隐含层到输出层
-	bp2();//更新输入层到隐含层
-	copy_w();
 }
 void split(char* s, double& a, double& b, double& c, double& d, int& label);
-void r()
+void r()//进行神经元训练 每运行一次就是训练一次
 {
 	FILE* fp = fopen("C:/Users/RZ/source/repos/Project2/iris.txt", "r");
 	char s[50] = { 0 };
-	while (fgets(s, 50, fp))
+	while (fgets(s, 50, fp))//遍历文件中的数据
 	{
 		if (s[0] == '\n')
 			break;
@@ -128,15 +138,17 @@ void r()
 		a[2].num = pc;
 		a[3].num = pd;
 
-		rr(label);
-
+		rr(label);//计算并赋值
+		bp1(label);//更新隐含层到输出层
+		bp2();//更新输入层到隐含层
+		copy_w();//备份w
 
 		for (int i = 0; i < 50; i++)//置零
 			s[i] = 0;
 	}
 	fclose(fp);
 }
-void split(char* s, double& a, double& b, double& c, double& d, int& label)
+void split(char* s, double& a, double& b, double& c, double& d, int& label)//把文件中的数据切片  这个函数乱写的 可以改掉
 {
 	//puts(s);
 	int j = 0;//读取s的指针
@@ -154,7 +166,7 @@ void split(char* s, double& a, double& b, double& c, double& d, int& label)
 			}
 			if (e == 1)
 				sum = sum * 10 + s[j] - '0';
-			else if (e == -1)//小数位
+			else if (e == -1)//小数位  这样写只能算到小数点后一位 是一个乱写的写法
 				sum += (1.0 * (s[j] - '0')) / 10.0;
 		}
 		j++;//跳过','
@@ -174,7 +186,7 @@ void split(char* s, double& a, double& b, double& c, double& d, int& label)
 		label = 2;
 	//cout << label << endl;
 }
-void pri()
+void pri()//最后输出结果的函数  有很多功能可以调用之前的函数 改一下变成调用函数 让这个函数不要这么臃肿
 {
 	FILE* fp = fopen("C:/Users/RZ/source/repos/Project2/iris.txt", "r");
 	char s[50] = { 0 };
@@ -241,8 +253,8 @@ int main()
 			w.w2[j][i] = (i + j) / 10.0;
 		}
 	}
-	for (int i = 0; i < epoch_num; i++)
+	for (int i = 0; i < epoch_num; i++)//训练几轮
 		r();
-	pri();
+	pri();//输出
 	return 0;
 }
