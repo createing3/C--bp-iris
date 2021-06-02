@@ -3,7 +3,7 @@
 #include<cstring>
 #include<cmath>
 using namespace std;
-#define inter_num 4
+#define epoch_num 1000
 #define lr 0.1
 typedef struct input_Point
 {
@@ -241,7 +241,7 @@ int main()
 			w.w2[j][i] = (i + j) / 10.0;
 		}
 	}
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < epoch_num; i++)
 		r();
 	pri();
 	return 0;
