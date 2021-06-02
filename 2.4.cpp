@@ -1,5 +1,6 @@
 
 //直接任务
+//完成请在这里进行标记
 //1.struct使用类代替
 //2.#define用静态变量表示    ————————已完成
 //3.char s[50]用string代替
@@ -20,8 +21,8 @@
 #include<cstring>
 #include<cmath>
 using namespace std;
-#define epoch_num 1000
-#define lr 0.1
+constexpr auto epoch_num = 1900;
+constexpr auto lr = 0.0025;
 typedef struct input_Point//输入层
 {
 	double num;
